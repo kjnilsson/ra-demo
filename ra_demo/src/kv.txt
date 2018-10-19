@@ -1,0 +1,73 @@
+-module(kv).
+-behaviour(ra_machine).
+
+-export([
+         %% Machine implementation
+         init/1,
+         apply/4,
+
+         %% Client api
+         put/3,
+         get/2,
+         delete/2,
+
+         %% Cluster management API
+         start/1,
+         replace_member/3
+
+         ]).
+
+-record(state, {store = #{} :: map()}).
+-opaque state() :: #state{}.
+
+-type key() :: term().
+-type value() :: term().
+-type command() :: {put, key(), value()} |
+                   {get, key()} |
+                   {delete, key()}.
+
+-export_type([state/0]).
+
+init(_Config) ->
+    #state{}.
+
+-spec apply(map(), command(), list(), state()) ->
+    {state(), list(), Result :: term()}.
+apply(_Meta, Command, Effects, State) ->
+    {State, Effects, ok}.
+
+%% Client api
+
+put(ServerId, Key, Value) -> ok.
+
+get(ServerId, Key) -> ok.
+
+delete(ServerId, Key) -> ok.
+
+%% cluster api
+
+start(Name) ->
+    ok.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+replace_member(ServerId, ServerIdToRemove, ServerIdToAdd) ->
+    {ok, Members, Leader} = ra:members(ServerId),
+    ok = ra:start_server(element(1, ServerId), ServerIdToAdd,
+                        {module, ?MODULE, #state{}}, Members),
+    {ok, _, Leader} = ra:add_member(ServerId, ServerIdToAdd),
+    {ok, _, _} = ra:remove_member(Leader, ServerIdToRemove),
+    ok = ra:delete_server(ServerIdToRemove),
+    ok.

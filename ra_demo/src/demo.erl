@@ -1,13 +1,9 @@
 -module(demo).
--behaviour(ra_machine).
 
 -export([
          start/0,
-         start_cluster/2,
+         start_cluster/2
 
-         %% ra_machine
-         init/1,
-         apply/4
          ]).
 
 -record(state, {}).
@@ -18,23 +14,15 @@
               state/0
               ]).
 
+connect_nodes() ->
+    [net_kernel:connect_node(N)
+     || N <- [x@snowman, a@snowman, b@snowman, c@snowman]].
+
 start() ->
-    application:load(ra),
-    Dir = filename:join(element(2, application:get_env(ra, data_dir)), node()),
-    application:set_env(ra, data_dir, Dir),
-    application:ensure_all_started(ra),
-    net_kernel:connect_node(a@snowman),
-    net_kernel:connect_node(b@snowman),
-    net_kernel:connect_node(c@snowman),
+    ra:start(),
+    connect_nodes(),
     ok.
 
-
-init(_) ->
-    {0, []}.
-
-apply(_Meta, Cmd, Effects, State) when is_integer(Cmd) ->
-    State1 = Cmd + State,
-    {State1, Effects, State1}.
 
 
 start_cluster(Name, Nodes) when is_atom(Name) ->

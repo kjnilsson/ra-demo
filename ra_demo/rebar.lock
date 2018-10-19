@@ -8,5 +8,5 @@
   1},
  {<<"ra">>,
   {git,"https://github.com/rabbitmq/ra.git",
-       {ref,"c9c895fefa45ecce8f57a9df48176ecbdc697122"}},
+       {ref,"4c0c57b7c0ca793c7fdf98d7499f73593473decc"}},
   0}].
